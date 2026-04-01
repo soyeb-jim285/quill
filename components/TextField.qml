@@ -45,6 +45,8 @@ Rectangle {
                 verticalAlignment: TextInput.AlignVCenter
                 focus: root.autoFocus
                 color: Theme.textPrimary
+                selectionColor: Theme.primary
+                selectedTextColor: Theme.base
                 font.pixelSize: Theme.fontSize
                 font.family: Theme.fontFamily
                 clip: true
