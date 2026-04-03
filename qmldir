@@ -10,6 +10,7 @@ Checkbox 1.0 components/Checkbox.qml
 RadioButton 1.0 components/RadioButton.qml
 RadioGroup 1.0 components/RadioGroup.qml
 Card 1.0 components/Card.qml
+Dialog 1.0 components/Dialog.qml
 Separator 1.0 components/Separator.qml
 Tabs 1.0 components/Tabs.qml
 Collapsible 1.0 components/Collapsible.qml

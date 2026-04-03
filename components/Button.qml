@@ -10,9 +10,18 @@ Rectangle {
     property string size: "medium"
     property bool enabled: true
     signal clicked()
+    activeFocusOnTab: enabled
     implicitWidth: contentRow.implicitWidth + (size === "small" ? 16 : size === "large" ? 32 : 24)
     implicitHeight: size === "small" ? 28 : size === "large" ? 40 : 34
     radius: Theme.radius
+    border.width: activeFocus ? 2 : 0
+    border.color: {
+        if (variant === "danger")
+            return Qt.lighter(Theme.error, 1.6)
+        if (variant === "ghost")
+            return Theme.textPrimary
+        return Qt.lighter(Theme.primary, 1.5)
+    }
     color: {
         if (!enabled) return Theme.surface0;
         let base;
@@ -24,6 +33,11 @@ Rectangle {
             default: base = Theme.primary;
         }
         if (mouse.pressed && enabled) return Qt.darker(base, 1.2);
+        if (activeFocus && enabled) {
+            if (variant === "ghost") return Theme.surface1;
+            if (variant === "danger") return Qt.lighter(base, 1.25);
+            return Qt.lighter(base, 1.08);
+        }
         if (mouse.containsMouse && enabled) {
             if (variant === "ghost") return Theme.surface0;
             return Qt.lighter(base, 1.15);
@@ -32,6 +46,21 @@ Rectangle {
     }
     opacity: enabled ? 1.0 : 0.5
     Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
+    Behavior on border.color { ColorAnimation { duration: Theme.animDurationFast } }
+
+    Accessible.role: Accessible.Button
+    Accessible.name: root.text !== "" ? root.text : root.icon
+    Accessible.description: root.text
+
+    Keys.onPressed: (event) => {
+        if (!root.enabled)
+            return
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+            event.accepted = true
+            root.clicked()
+        }
+    }
+
     Row {
         id: contentRow
         anchors.centerIn: parent
@@ -65,6 +94,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: root.enabled
         cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onPressed: if (root.enabled) root.forceActiveFocus()
         onClicked: if (root.enabled) root.clicked()
     }
 }
