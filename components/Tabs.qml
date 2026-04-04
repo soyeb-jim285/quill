@@ -6,7 +6,6 @@ Item {
     id: root
     property var model: []
     property int currentIndex: 0
-    property bool enabled: true
     signal tabChanged(int index)
     implicitHeight: 36
     opacity: enabled ? 1.0 : 0.5

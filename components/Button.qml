@@ -8,7 +8,6 @@ Rectangle {
     property string icon: ""
     property string variant: "primary"
     property string size: "medium"
-    property bool enabled: true
     signal clicked()
     activeFocusOnTab: enabled
     implicitWidth: contentRow.implicitWidth + (size === "small" ? 16 : size === "large" ? 32 : 24)

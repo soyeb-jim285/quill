@@ -7,7 +7,6 @@ Item {
     property var model: []
     property int currentIndex: 0
     property string label: ""
-    property bool enabled: true
     signal selected(int index, string value)
     implicitHeight: 34
     implicitWidth: 200

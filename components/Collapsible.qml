@@ -6,7 +6,6 @@ ColumnLayout {
     id: root
     property string title: ""
     property bool expanded: false
-    property bool enabled: true
     default property alias content: contentContainer.data
     spacing: 0
     opacity: enabled ? 1.0 : 0.5

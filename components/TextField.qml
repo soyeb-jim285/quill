@@ -8,7 +8,6 @@ Rectangle {
     property string placeholder: ""
     property string icon: ""
     property string variant: "default"
-    property bool enabled: true
     property bool autoFocus: false
     property bool hasActiveFocus: input.activeFocus
     property int echoMode: TextInput.Normal
