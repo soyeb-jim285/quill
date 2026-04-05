@@ -12,6 +12,9 @@ Item {
     implicitWidth: 200
     Layout.fillWidth: true
     property bool dropdownOpen: false
+    Accessible.role: Accessible.ComboBox
+    Accessible.name: root.label !== "" ? root.label : (root.model[root.currentIndex] ?? "")
+    Accessible.description: root.model[root.currentIndex] ?? ""
 
     RowLayout {
         anchors.left: parent.left

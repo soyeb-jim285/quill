@@ -10,6 +10,8 @@ Item {
     implicitHeight: 36
     opacity: enabled ? 1.0 : 0.5
     Layout.fillWidth: true
+    Accessible.role: Accessible.PageTabList
+    Accessible.name: "Tab bar"
     Row {
         id: tabRow
         anchors.fill: parent

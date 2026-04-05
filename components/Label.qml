@@ -6,6 +6,9 @@ Text {
 
     property string variant: "body" // "heading" | "body" | "caption" | "overline"
 
+    Accessible.role: variant === "heading" ? Accessible.Heading : Accessible.StaticText
+    Accessible.name: root.text
+
     color: Theme.textPrimary
     font.family: Theme.fontFamily
     font.pixelSize: {

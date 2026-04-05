@@ -8,6 +8,8 @@ Item {
     z: 1000
     x: target ? (target.width - tooltipBg.width) / 2 : 0
     y: target ? -tooltipBg.height - 6 : 0
+    Accessible.role: Accessible.ToolTip
+    Accessible.name: root.text
     Rectangle {
         id: tooltipBg
         width: tooltipText.implicitWidth + Theme.spacingMd * 2

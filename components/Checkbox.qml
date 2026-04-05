@@ -9,6 +9,9 @@ RowLayout {
     signal toggled(bool value)
     spacing: Theme.spacing
     opacity: enabled ? 1.0 : 0.5
+    Accessible.role: Accessible.CheckBox
+    Accessible.name: root.label
+    Accessible.checked: root.checked
     Rectangle {
         width: 20; height: 20
         radius: Theme.radiusSm

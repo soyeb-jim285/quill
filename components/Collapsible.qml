@@ -10,6 +10,9 @@ ColumnLayout {
     spacing: 0
     opacity: enabled ? 1.0 : 0.5
     Layout.fillWidth: true
+    Accessible.role: Accessible.Grouping
+    Accessible.name: root.title
+    Accessible.description: root.expanded ? "expanded" : "collapsed"
     Rectangle {
         Layout.fillWidth: true
         height: 40; radius: Theme.radius

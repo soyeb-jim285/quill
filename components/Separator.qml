@@ -10,4 +10,6 @@ Rectangle {
     implicitWidth: orientation === Qt.Horizontal ? 100 : 1
     implicitHeight: orientation === Qt.Horizontal ? 1 : 100
     color: Theme.surface1
+    Accessible.role: Accessible.Separator
+    Accessible.ignored: true
 }

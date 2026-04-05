@@ -13,6 +13,9 @@ RowLayout {
     property bool _isSelected: _inGroup ? parent.value === root.value : root.checked
     spacing: Theme.spacing
     opacity: enabled ? 1.0 : 0.5
+    Accessible.role: Accessible.RadioButton
+    Accessible.name: root.label
+    Accessible.checked: root._isSelected
     Rectangle {
         width: 20; height: 20
         radius: Theme.radiusFull

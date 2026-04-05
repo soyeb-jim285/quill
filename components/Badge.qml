@@ -17,6 +17,8 @@ Rectangle {
             default: return Theme.primary;
         }
     }
+    Accessible.role: Accessible.StaticText
+    Accessible.name: root.text !== "" ? root.text : root.variant + " indicator"
     Text {
         id: badgeText
         visible: !root._isDot

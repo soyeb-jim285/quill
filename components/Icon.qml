@@ -7,6 +7,9 @@ Text {
     property string glyph: ""
     property string size: "medium" // "small" | "medium" | "large"
 
+    Accessible.role: Accessible.Graphic
+    Accessible.ignored: true
+
     text: glyph
     color: Theme.textPrimary
     font.family: Theme.iconFont

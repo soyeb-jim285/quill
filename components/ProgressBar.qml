@@ -12,6 +12,8 @@ Rectangle {
     Layout.fillWidth: true
     radius: Theme.radiusFull
     color: Theme.surface1
+    Accessible.role: Accessible.ProgressBar
+    Accessible.name: root.indeterminate ? "Loading" : Math.round(root.value * 100) + " percent"
 
     // Animated display value; monotonic mode ignores transient backward updates.
     readonly property real _clampedValue: {

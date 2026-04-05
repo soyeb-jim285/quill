@@ -21,6 +21,9 @@ Rectangle {
     border.color: input.activeFocus ? Theme.primary : Theme.surface1
     border.width: variant === "default" ? 1 : 0
     opacity: enabled ? 1.0 : 0.5
+    Accessible.role: Accessible.EditableText
+    Accessible.name: root.placeholder
+    Accessible.description: root.text
     Behavior on border.color { ColorAnimation { duration: Theme.animDurationFast } }
     Row {
         anchors.fill: parent

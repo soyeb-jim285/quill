@@ -9,6 +9,8 @@ Item {
     property string emptyText: "No items"
     implicitHeight: 200
     Layout.fillWidth: true
+    Accessible.role: Accessible.List
+    Accessible.name: "Scrollable list"
     Text {
         visible: listView.count === 0
         anchors.centerIn: parent

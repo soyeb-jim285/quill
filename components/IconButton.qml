@@ -30,6 +30,8 @@ Rectangle {
         return base;
     }
     opacity: enabled ? 1.0 : 0.5
+    Accessible.role: Accessible.Button
+    Accessible.name: root.tooltip !== "" ? root.tooltip : root.icon
     Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
     Text {
         anchors.centerIn: parent

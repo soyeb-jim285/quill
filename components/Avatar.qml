@@ -13,6 +13,8 @@ Rectangle {
     radius: rounded ? Theme.radiusFull : Theme.radius
     color: Theme.surface1
     clip: true
+    Accessible.role: Accessible.Graphic
+    Accessible.name: root.fallback !== "" ? root.fallback : "Avatar"
     Image {
         id: img
         anchors.fill: parent

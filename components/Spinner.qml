@@ -9,6 +9,8 @@ Item {
     property int _size: size === "small" ? 16 : size === "large" ? 32 : 24
     implicitWidth: _size
     implicitHeight: _size
+    Accessible.role: Accessible.Indicator
+    Accessible.name: root.running ? "Loading" : "Idle"
     Rectangle {
         id: spinner
         anchors.fill: parent

@@ -14,6 +14,8 @@ Rectangle {
     color: Theme.surface0
     border.color: Theme.surface1
     border.width: 1
+    Accessible.role: Accessible.Grouping
+    Accessible.name: root.title
     ColumnLayout {
         id: mainColumn
         anchors.fill: parent

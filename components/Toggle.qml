@@ -10,6 +10,9 @@ RowLayout {
     signal toggled(bool value)
     spacing: Theme.spacingMd
     opacity: enabled ? 1.0 : 0.5
+    Accessible.role: Accessible.CheckBox
+    Accessible.name: root.label
+    Accessible.checked: root.checked
     Text {
         visible: root.label !== ""
         text: root.label

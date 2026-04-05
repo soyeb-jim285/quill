@@ -17,6 +17,9 @@ RowLayout {
     spacing: Theme.spacingMd
     opacity: enabled ? 1.0 : 0.5
     Layout.fillWidth: true
+    Accessible.role: Accessible.Slider
+    Accessible.name: root.label
+    Accessible.description: root.value.toString()
     Text {
         visible: root.label !== ""
         text: root.label
