@@ -6,7 +6,6 @@ RowLayout {
     id: root
     property bool checked: false
     property string label: ""
-    property bool enabled: true
     signal toggled(bool value)
     spacing: Theme.spacingMd
     opacity: enabled ? 1.0 : 0.5
