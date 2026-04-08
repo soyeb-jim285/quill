@@ -23,7 +23,7 @@ RowLayout {
     Rectangle {
         width: 40; height: 22; radius: 11
         color: root.checked ? Theme.primary : Theme.surface1
-        Behavior on color { ColorAnimation { duration: 150 } }
+        Behavior on color { ColorAnimation { duration: Theme.animDurationFast } }
         Rectangle {
             width: 18; height: 18; radius: 9
             anchors.verticalCenter: parent.verticalCenter

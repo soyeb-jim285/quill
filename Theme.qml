@@ -45,7 +45,7 @@ QtObject {
     readonly property color subtext0: textTertiary
 
     // Typography
-    property string fontFamily: "Maple Mono"
+    property string fontFamily: Qt.application.font.family
     property string iconFont: "Maple Mono NF"
     property int fontSizeSmall: 11
     property int fontSize: 13

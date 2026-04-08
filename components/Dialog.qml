@@ -56,18 +56,18 @@ Item {
         id: openAnim
         NumberAnimation {
             target: dialogBox; property: "opacity"
-            from: 0; to: 1; duration: 180
+            from: 0; to: 1; duration: Theme.animDurationFast
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             target: dialogBox; property: "scale"
-            from: 0.88; to: 1; duration: 250
+            from: 0.88; to: 1; duration: Theme.animDurationSlow
             easing.type: Easing.OutBack
             easing.overshoot: 0.8
         }
         NumberAnimation {
             target: dialogBox; property: "yOffset"
-            from: -8; to: 0; duration: 220
+            from: -8; to: 0; duration: Theme.animDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -77,17 +77,17 @@ Item {
         ParallelAnimation {
             NumberAnimation {
                 target: dialogBox; property: "opacity"
-                to: 0; duration: 120
+                to: 0; duration: Theme.animDurationFast
                 easing.type: Easing.InCubic
             }
             NumberAnimation {
                 target: dialogBox; property: "scale"
-                to: 0.92; duration: 120
+                to: 0.92; duration: Theme.animDurationFast
                 easing.type: Easing.InCubic
             }
             NumberAnimation {
                 target: dialogBox; property: "yOffset"
-                to: -4; duration: 120
+                to: -4; duration: Theme.animDurationFast
                 easing.type: Easing.InCubic
             }
         }
