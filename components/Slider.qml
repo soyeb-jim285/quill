@@ -11,11 +11,10 @@ RowLayout {
     property string label: ""
     property bool showValue: false
     property int decimals: 0
-    property bool enabled: true
     property color trackColor: Theme.primary
     signal moved(real value)
     spacing: Theme.spacingMd
-    opacity: enabled ? 1.0 : 0.5
+    opacity: root.enabled ? 1.0 : 0.5
     Layout.fillWidth: true
     Accessible.role: Accessible.Slider
     Accessible.name: root.label
