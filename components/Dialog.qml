@@ -8,6 +8,10 @@ Item {
     property string title: ""
     property string subtitle: ""
     property int dialogWidth: 360
+    property int dialogPadding: 20
+    property color dialogColor: Theme.mantle
+    property color dialogBorderColor: Qt.rgba(Theme.textPrimary.r, Theme.textPrimary.g, Theme.textPrimary.b, 0.1)
+    property real dialogRadius: Theme.radiusLg
     property bool closeOnOverlayPress: true
     property bool closeOnEscape: true
     property Item initialFocusItem: null
@@ -120,6 +124,22 @@ Item {
         property real yOffset: 0
         transform: Translate { y: dialogBox.yOffset }
 
+        Behavior on width {
+            enabled: root.visible && !openAnim.running && !closeAnim.running
+            NumberAnimation {
+                duration: Theme.animDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Behavior on height {
+            enabled: root.visible && !openAnim.running && !closeAnim.running
+            NumberAnimation {
+                duration: Theme.animDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
         Keys.onEscapePressed: (event) => {
             if (!root.closeOnEscape)
                 return
@@ -132,9 +152,10 @@ Item {
             anchors.fill: parent
             title: root.title
             subtitle: root.subtitle
-            padding: 20
-            color: Theme.mantle
-            border.color: Qt.rgba(Theme.textPrimary.r, Theme.textPrimary.g, Theme.textPrimary.b, 0.1)
+            padding: root.dialogPadding
+            color: root.dialogColor
+            border.color: root.dialogBorderColor
+            radius: root.dialogRadius
         }
     }
 }
