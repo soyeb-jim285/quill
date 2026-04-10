@@ -75,18 +75,27 @@ Item {
     // Popup reparented to the window root so it's never clipped
     Item {
         id: dropdownPopup
-        visible: root.dropdownOpen
+        // Stay rendered while the popup is animating out
+        visible: dropdownList.visible
         parent: root.Window.window ? root.Window.window.contentItem : root
         z: 10000
 
-        // Click-outside overlay
+        // Click-outside overlay — only intercept when fully open
         MouseArea {
             anchors.fill: parent
+            enabled: root.dropdownOpen
             onClicked: root.dropdownOpen = false
         }
 
         Rectangle {
             id: dropdownList
+            // Keep rendered until fade-out finishes
+            visible: opacity > 0.01
+            // shadcn-style entrance: fade + subtle scale from the top edge
+            opacity: root.dropdownOpen ? 1.0 : 0.0
+            scale: root.dropdownOpen ? 1.0 : 0.96
+            transformOrigin: Item.Top
+
             x: _mappedPos.x
             y: _mappedPos.y
             width: buttonRect.width
@@ -97,8 +106,17 @@ Item {
             border.width: 1
             clip: true
 
+            Behavior on opacity {
+                NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+            }
+            Behavior on scale {
+                NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+            }
+
             property point _mappedPos: {
-                if (!root.dropdownOpen || !buttonRect) return Qt.point(0, 0);
+                // Recompute while visible (including during close) so the
+                // popup doesn't jump if the button moves mid-animation.
+                if (!buttonRect || !dropdownPopup.parent) return Qt.point(0, 0);
                 var globalPos = buttonRect.mapToItem(dropdownPopup.parent, 0, buttonRect.height + 4);
                 return globalPos;
             }
