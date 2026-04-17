@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Window
 import ".."
 
 Item {
@@ -15,6 +16,23 @@ Item {
     Accessible.role: Accessible.ComboBox
     Accessible.name: root.label !== "" ? root.label : (root.model[root.currentIndex] ?? "")
     Accessible.description: root.model[root.currentIndex] ?? ""
+
+    // The host window the dropdown lives in. Close the popup whenever the
+    // host moves, resizes, or loses focus so the popup never detaches from
+    // its anchor.
+    readonly property var _hostWindow: root.Window.window
+    Connections {
+        target: root._hostWindow
+        ignoreUnknownSignals: true
+        function onXChanged() { root.dropdownOpen = false }
+        function onYChanged() { root.dropdownOpen = false }
+        function onWidthChanged() { root.dropdownOpen = false }
+        function onHeightChanged() { root.dropdownOpen = false }
+        function onActiveChanged() {
+            if (root._hostWindow && !root._hostWindow.active)
+                root.dropdownOpen = false
+        }
+    }
 
     RowLayout {
         anchors.left: parent.left
@@ -72,54 +90,47 @@ Item {
         }
     }
 
-    // Popup reparented to the window root so it's never clipped
-    Item {
-        id: dropdownPopup
-        // Stay rendered while the popup is animating out
-        visible: dropdownList.visible
-        parent: root.Window.window ? root.Window.window.contentItem : root
-        z: 10000
+    // The popup is its own native Window. That avoids every class of
+    // clipping / culling / z-order problem inside ancestor Flickables or
+    // child Qt Windows (settings dialogs, frameless tool popups, etc.):
+    // the compositor places it on top unconditionally. The earlier approach
+    // of reparenting an Item to the window's contentItem was fragile — on
+    // some hosts (notably a Qt.Dialog SettingsPanel) the popup children
+    // got culled and the list never painted.
+    Window {
+        id: popupWindow
+        flags: Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
+        color: "transparent"
+        transientParent: root._hostWindow ? root._hostWindow : null
+        visible: root.dropdownOpen
 
-        // Click-outside overlay — only intercept when fully open
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.dropdownOpen
-            onClicked: root.dropdownOpen = false
+        width: buttonRect.width
+        height: Math.min(root.model.length * 34 + 8, 208)
+
+        // Anchor to the button in global screen coords. The explicit
+        // geometry reads register buttonRect's x/y/w/h as dependencies, so
+        // the binding re-evaluates when the button moves or is resized —
+        // mapToItem() alone isn't reactive to geometry.
+        readonly property point _anchor: {
+            if (!buttonRect) return Qt.point(0, 0);
+            var _bx = buttonRect.x, _by = buttonRect.y;
+            var _bw = buttonRect.width, _bh = buttonRect.height;
+            var hx = root._hostWindow ? root._hostWindow.x : 0;
+            var hy = root._hostWindow ? root._hostWindow.y : 0;
+            var local = buttonRect.mapToItem(null, 0, _bh + 4);
+            return Qt.point(hx + local.x, hy + local.y);
         }
+        x: _anchor.x
+        y: _anchor.y
 
         Rectangle {
             id: dropdownList
-            // Keep rendered until fade-out finishes
-            visible: opacity > 0.01
-            // shadcn-style entrance: fade + subtle scale from the top edge
-            opacity: root.dropdownOpen ? 1.0 : 0.0
-            scale: root.dropdownOpen ? 1.0 : 0.96
-            transformOrigin: Item.Top
-
-            x: _mappedPos.x
-            y: _mappedPos.y
-            width: buttonRect.width
-            height: Math.min(root.model.length * 34, 200)
+            anchors.fill: parent
             radius: Theme.radius
             color: Theme.surface0
             border.color: Theme.surface1
             border.width: 1
             clip: true
-
-            Behavior on opacity {
-                NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
-            }
-            Behavior on scale {
-                NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
-            }
-
-            property point _mappedPos: {
-                // Recompute while visible (including during close) so the
-                // popup doesn't jump if the button moves mid-animation.
-                if (!buttonRect || !dropdownPopup.parent) return Qt.point(0, 0);
-                var globalPos = buttonRect.mapToItem(dropdownPopup.parent, 0, buttonRect.height + 4);
-                return globalPos;
-            }
 
             ListView {
                 id: listView
@@ -159,6 +170,13 @@ Item {
                     }
                 }
             }
+        }
+
+        // Qt.Popup normally auto-closes on outside click, but be explicit
+        // so losing focus (Escape, Alt-Tab) also closes the popup.
+        onActiveChanged: {
+            if (!active)
+                root.dropdownOpen = false
         }
     }
 
