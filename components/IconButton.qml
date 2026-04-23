@@ -51,7 +51,6 @@ Rectangle {
         onClicked: if (root.enabled) root.clicked()
     }
     Tooltip {
-        target: root
         text: root.tooltip
         visible: root.tooltip !== "" && mouse.containsMouse
     }
