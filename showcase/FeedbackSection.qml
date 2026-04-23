@@ -30,6 +30,31 @@ ColumnLayout {
             IconButton { icon: "\uf007"; tooltip: "Profile"; variant: "ghost" }
             IconButton { icon: "\uf002"; tooltip: "Search"; variant: "ghost" }
         }
+
+        Text {
+            text: "Child-component form on a bare item"
+            color: Theme.textSecondary
+            font.pixelSize: Theme.fontSize
+            font.family: Theme.fontFamily
+        }
+        Rectangle {
+            width: 220
+            height: 48
+            radius: Theme.radiusSm
+            color: Theme.surface1
+            border.color: Theme.surface2
+            Text {
+                anchors.centerIn: parent
+                text: "Hover me"
+                color: Theme.textPrimary
+                font.family: Theme.fontFamily
+            }
+            HoverHandler { id: hoverArea }
+            Tooltip {
+                visible: hoverArea.hovered
+                text: "Attached via HoverHandler"
+            }
+        }
     }
 
     // ── Badge ──
