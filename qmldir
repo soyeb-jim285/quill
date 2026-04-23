@@ -1,5 +1,6 @@
 module Quill
 singleton Theme 1.0 Theme.qml
+singleton Format 1.0 components/Format.qml
 Button 1.0 components/Button.qml
 IconButton 1.0 components/IconButton.qml
 Toggle 1.0 components/Toggle.qml
