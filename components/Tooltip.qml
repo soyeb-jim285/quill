@@ -16,14 +16,13 @@ T.ToolTip {
 
     y: -implicitHeight - 6
 
-    Accessible.role: Accessible.ToolTip
-    Accessible.name: root.text
-
     contentItem: Text {
         text: root.text
         color: Theme.textPrimary
         font.pixelSize: Theme.fontSizeSmall
         font.family: Theme.fontFamily
+        Accessible.role: Accessible.ToolTip
+        Accessible.name: root.text
     }
 
     background: Rectangle {
