@@ -8,6 +8,7 @@ Item {
     property var model: []
     property int currentIndex: 0
     property string label: ""
+    property int popupIndex: currentIndex
     signal selected(int index, string value)
     implicitHeight: 34
     implicitWidth: 200
@@ -84,6 +85,7 @@ Item {
                 cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                 onClicked: {
                     if (!root.enabled) return;
+                    root.popupIndex = root.currentIndex;
                     root.dropdownOpen = !root.dropdownOpen;
                 }
             }
@@ -137,7 +139,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 4
                 model: root.model
-                currentIndex: root.currentIndex
+                currentIndex: root.popupIndex
                 boundsBehavior: Flickable.StopAtBounds
                 delegate: Rectangle {
                     required property string modelData
@@ -145,7 +147,7 @@ Item {
                     width: listView.width
                     height: 30
                     radius: Theme.radiusSm
-                    color: index === root.currentIndex
+                    color: index === root.popupIndex
                         ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15)
                         : itemMouse.containsMouse ? Theme.surface1 : "transparent"
                     Text {
@@ -153,7 +155,7 @@ Item {
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacing
                         text: modelData
-                        color: index === root.currentIndex ? Theme.primary : Theme.textPrimary
+                        color: index === root.popupIndex ? Theme.primary : Theme.textPrimary
                         font.pixelSize: Theme.fontSize
                         font.family: Theme.fontFamily
                     }
@@ -162,10 +164,12 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                        onPressed: (event) => {
                             root.currentIndex = index;
+                            root.popupIndex = index;
                             root.selected(index, modelData);
                             root.dropdownOpen = false;
+                            event.accepted = true;
                         }
                     }
                 }
@@ -180,13 +184,19 @@ Item {
         }
     }
 
-    onDropdownOpenChanged: { if (dropdownOpen) forceActiveFocus(); }
+    onDropdownOpenChanged: {
+        if (dropdownOpen) {
+            popupIndex = currentIndex;
+            forceActiveFocus();
+        }
+    }
     Keys.onEscapePressed: dropdownOpen = false
-    Keys.onUpPressed: { if (dropdownOpen && currentIndex > 0) currentIndex--; }
-    Keys.onDownPressed: { if (dropdownOpen && currentIndex < model.length - 1) currentIndex++; }
+    Keys.onUpPressed: { if (dropdownOpen && popupIndex > 0) popupIndex--; }
+    Keys.onDownPressed: { if (dropdownOpen && popupIndex < model.length - 1) popupIndex++; }
     Keys.onReturnPressed: {
         if (dropdownOpen) {
-            selected(currentIndex, model[currentIndex]);
+            currentIndex = popupIndex;
+            selected(popupIndex, model[popupIndex]);
             dropdownOpen = false;
         }
     }
