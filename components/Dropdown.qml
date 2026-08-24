@@ -13,6 +13,22 @@ Item {
     implicitWidth: 200
     Layout.fillWidth: true
     property bool dropdownOpen: false
+
+    // Long lists get a filter box. Short ones do not need one, so this stays
+    // automatic and call sites do not have to opt in.
+    property bool searchable: (root.model ? root.model.length : 0) > 12
+    // Font pickers render each entry in the family it names.
+    property bool previewFont: false
+    property string searchText: ""
+
+    readonly property var _visibleModel: {
+        const all = root.model ?? [];
+        const needle = root.searchText.trim().toLowerCase();
+        if (needle === "")
+            return all;
+        return all.filter(entry => String(entry).toLowerCase().indexOf(needle) >= 0);
+    }
+
     Accessible.role: Accessible.ComboBox
     Accessible.name: root.label !== "" ? root.label : (root.model[root.currentIndex] ?? "")
     Accessible.description: root.model[root.currentIndex] ?? ""
@@ -104,8 +120,9 @@ Item {
         transientParent: root._hostWindow ? root._hostWindow : null
         visible: root.dropdownOpen
 
+        readonly property int _searchHeight: root.searchable ? 38 : 0
         width: buttonRect.width
-        height: Math.min(root.model.length * 34 + 8, 208)
+        height: Math.min(root._visibleModel.length * 34 + 8, 300) + _searchHeight
 
         // Anchor to the button in global screen coords. The explicit
         // geometry reads register buttonRect's x/y/w/h as dependencies, so
@@ -131,42 +148,137 @@ Item {
             border.color: Theme.surface1
             border.width: 1
             clip: true
+            opacity: root.dropdownOpen ? 1.0 : 0.0
+            Behavior on opacity { NumberAnimation { duration: Theme.animDurationFast } }
+
+            // Filter field. Only built for long lists; short ones keep the
+            // popup as compact as it was.
+            Rectangle {
+                id: searchRow
+                visible: root.searchable
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.margins: 4
+                height: visible ? 30 : 0
+                radius: Theme.radiusSm
+                color: Theme.surface1
+                border.color: searchInput.activeFocus ? Theme.primary : "transparent"
+                border.width: 1
+
+                Text {
+                    id: searchIcon
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacing
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "\uf002"
+                    color: Theme.textTertiary
+                    font.family: Theme.iconFont
+                    font.pixelSize: 10
+                }
+
+                TextInput {
+                    id: searchInput
+                    anchors.left: searchIcon.right
+                    anchors.leftMargin: Theme.spacing
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacing
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.textPrimary
+                    font.pixelSize: Theme.fontSize
+                    font.family: Theme.fontFamily
+                    selectByMouse: true
+                    selectionColor: Theme.primary
+                    clip: true
+                    onTextChanged: root.searchText = text
+                    Keys.onEscapePressed: {
+                        if (text !== "")
+                            text = "";
+                        else
+                            root.dropdownOpen = false;
+                    }
+                    Keys.onDownPressed: listView.incrementCurrentIndex()
+                    Keys.onUpPressed: listView.decrementCurrentIndex()
+                    Keys.onReturnPressed: root._commit(listView.currentIndex)
+
+                    Text {
+                        anchors.fill: parent
+                        visible: searchInput.text === ""
+                        verticalAlignment: Text.AlignVCenter
+                        text: "Search\u2026"
+                        color: Theme.textTertiary
+                        font: searchInput.font
+                    }
+                }
+            }
 
             ListView {
                 id: listView
-                anchors.fill: parent
+                anchors.top: root.searchable ? searchRow.bottom : parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
                 anchors.margins: 4
-                model: root.model
-                currentIndex: root.currentIndex
+                model: root._visibleModel
                 boundsBehavior: Flickable.StopAtBounds
+                clip: true
+                highlightMoveDuration: 0
+
+                // Nothing matched the filter — say so instead of showing an
+                // empty box that reads as a broken popup.
+                Text {
+                    anchors.centerIn: parent
+                    visible: listView.count === 0
+                    text: "No matches"
+                    color: Theme.textTertiary
+                    font.pixelSize: Theme.fontSize
+                    font.family: Theme.fontFamily
+                }
+
                 delegate: Rectangle {
                     required property string modelData
                     required property int index
+                    readonly property bool isCurrent: modelData === (root.model[root.currentIndex] ?? "")
                     width: listView.width
                     height: 30
                     radius: Theme.radiusSm
-                    color: index === root.currentIndex
+                    color: isCurrent
                         ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15)
-                        : itemMouse.containsMouse ? Theme.surface1 : "transparent"
+                        : (itemMouse.containsMouse || index === listView.currentIndex) ? Theme.surface1 : "transparent"
+
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
                         anchors.leftMargin: Theme.spacing
+                        anchors.right: tick.left
+                        anchors.rightMargin: Theme.spacing
                         text: modelData
-                        color: index === root.currentIndex ? Theme.primary : Theme.textPrimary
+                        elide: Text.ElideRight
+                        color: parent.isCurrent ? Theme.primary : Theme.textPrimary
                         font.pixelSize: Theme.fontSize
-                        font.family: Theme.fontFamily
+                        // A font picker is far easier to use when each row is
+                        // drawn in the family it names.
+                        font.family: root.previewFont ? modelData : Theme.fontFamily
                     }
+
+                    Text {
+                        id: tick
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacing
+                        visible: parent.isCurrent
+                        text: "\uf00c"
+                        color: Theme.primary
+                        font.family: Theme.iconFont
+                        font.pixelSize: 10
+                    }
+
                     MouseArea {
                         id: itemMouse
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.currentIndex = index;
-                            root.selected(index, modelData);
-                            root.dropdownOpen = false;
-                        }
+                        onClicked: root._commit(index)
                     }
                 }
             }
@@ -180,14 +292,36 @@ Item {
         }
     }
 
-    onDropdownOpenChanged: { if (dropdownOpen) forceActiveFocus(); }
-    Keys.onEscapePressed: dropdownOpen = false
-    Keys.onUpPressed: { if (dropdownOpen && currentIndex > 0) currentIndex--; }
-    Keys.onDownPressed: { if (dropdownOpen && currentIndex < model.length - 1) currentIndex++; }
-    Keys.onReturnPressed: {
+    // Rows are addressed by their position in the filtered list, so map back
+    // to the caller's model index before reporting a selection.
+    function _commit(visibleIndex) {
+        const value = root._visibleModel[visibleIndex];
+        if (value === undefined)
+            return;
+        const modelIndex = (root.model ?? []).indexOf(value);
+        if (modelIndex >= 0)
+            root.currentIndex = modelIndex;
+        root.selected(modelIndex, value);
+        root.dropdownOpen = false;
+    }
+
+    onDropdownOpenChanged: {
         if (dropdownOpen) {
-            selected(currentIndex, model[currentIndex]);
-            dropdownOpen = false;
+            searchText = "";
+            searchInput.text = "";
+            // Start on the selected entry so the list opens where the user
+            // left it rather than scrolled to the top.
+            listView.currentIndex = Math.max(0, root._visibleModel.indexOf(root.model[root.currentIndex] ?? ""));
+            listView.positionViewAtIndex(listView.currentIndex, ListView.Center);
+            if (searchable)
+                searchInput.forceActiveFocus();
+            else
+                forceActiveFocus();
         }
     }
+
+    Keys.onEscapePressed: dropdownOpen = false
+    Keys.onUpPressed: { if (dropdownOpen) listView.decrementCurrentIndex(); }
+    Keys.onDownPressed: { if (dropdownOpen) listView.incrementCurrentIndex(); }
+    Keys.onReturnPressed: { if (dropdownOpen) root._commit(listView.currentIndex); }
 }
