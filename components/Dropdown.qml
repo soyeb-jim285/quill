@@ -6,6 +6,8 @@ import ".."
 Item {
     id: root
     property var model: []
+    // Owned by whoever uses the Dropdown: bind it to your own state and update
+    // that state in onSelected. The Dropdown never writes to it.
     property int currentIndex: 0
     property string label: ""
     signal selected(int index, string value)
@@ -299,8 +301,11 @@ Item {
         if (value === undefined)
             return;
         const modelIndex = (root.model ?? []).indexOf(value);
-        if (modelIndex >= 0)
-            root.currentIndex = modelIndex;
+        // Deliberately not writing root.currentIndex here. Assigning to your
+        // own property from QML destroys whatever binding the owner put on it,
+        // so a Dropdown whose value can also change from elsewhere would show
+        // a stale row from the first pick onwards. Report the selection and
+        // let the owner move currentIndex.
         root.selected(modelIndex, value);
         root.dropdownOpen = false;
     }

@@ -241,15 +241,22 @@ ColumnLayout {
         spacing: Theme.spacingMd
         Layout.fillWidth: true
 
+        // currentIndex is owned by the caller, so track the pick locally.
         Dropdown {
+            id: themeDropdown
+            property int selectedIndex: 0
             label: "Theme"
             model: ["Catppuccin Mocha", "Catppuccin Latte", "Catppuccin Frappe", "Catppuccin Macchiato"]
-            currentIndex: 0
+            currentIndex: themeDropdown.selectedIndex
+            onSelected: (index) => themeDropdown.selectedIndex = index
             Layout.fillWidth: true
         }
         Dropdown {
+            id: optionDropdown
+            property int selectedIndex: 1
             model: ["Option A", "Option B", "Option C"]
-            currentIndex: 1
+            currentIndex: optionDropdown.selectedIndex
+            onSelected: (index) => optionDropdown.selectedIndex = index
             Layout.fillWidth: true
         }
         Dropdown {
