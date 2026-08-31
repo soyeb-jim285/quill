@@ -28,11 +28,16 @@ Item {
     Accessible.name: root.title
 
     function open() {
+        // Drop a close still in flight. Its trailing ScriptAction sets
+        // visible = false, so reopening during one (a dialog that asks again
+        // after rejecting what you typed) would tear the new dialog straight
+        // back down, and its opacity animation would fight the open.
+        closeAnim.stop()
         visible = true
         dialogBox.opacity = 0
         dialogBox.scale = 0.88
         dialogBox.yOffset = -8
-        openAnim.start()
+        openAnim.restart()
         Qt.callLater(function() {
             if (root.initialFocusItem)
                 root.initialFocusItem.forceActiveFocus()
@@ -43,7 +48,8 @@ Item {
     }
 
     function close() {
-        closeAnim.start()
+        openAnim.stop()
+        closeAnim.restart()
     }
 
     function accept() {
