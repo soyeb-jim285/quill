@@ -19,6 +19,13 @@ T.ToolTip {
     delay: 500
     timeout: -1
 
+    // The template has no size of its own; without these the popup is 0x0
+    // and the background never shows.
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     padding: 0
     leftPadding: Theme.spacingMd
     rightPadding: Theme.spacingMd
