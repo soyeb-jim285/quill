@@ -18,7 +18,8 @@ Rectangle {
     }
     activeFocusOnTab: enabled
     implicitWidth: contentRow.implicitWidth + (size === "small" ? 16 : size === "large" ? 32 : 24)
-    implicitHeight: size === "small" ? 28 : size === "large" ? 40 : 34
+    readonly property int _fontSize: size === "small" ? Theme.fontSizeSmall : size === "large" ? Theme.fontSizeLarge : Theme.fontSize
+    implicitHeight: Math.max(size === "small" ? 28 : size === "large" ? 40 : 34, contentRow.implicitHeight + 12)
     radius: Theme.radius
     border.width: activeFocus ? 2 : 0
     border.color: {
@@ -82,7 +83,7 @@ Rectangle {
             text: root.icon
             color: root.contentColor
             font.family: Theme.iconFont
-            font.pixelSize: root.size === "small" ? 12 : root.size === "large" ? 16 : 14
+            font.pixelSize: root._fontSize + 1
             anchors.verticalCenter: parent.verticalCenter
         }
         Text {
@@ -90,7 +91,7 @@ Rectangle {
             text: root.text
             color: root.contentColor
             font.family: Theme.fontFamily
-            font.pixelSize: root.size === "small" ? 11 : root.size === "large" ? 15 : 13
+            font.pixelSize: root._fontSize
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter
         }
