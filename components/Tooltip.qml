@@ -16,7 +16,7 @@ T.ToolTip {
     // Item-mode rendering is bullet-proof for short-lived hover chips.
     popupType: T.Popup.Item
 
-    delay: 500
+    delay: 100
     timeout: -1
 
     // The template has no size of its own; without these the popup is 0x0
