@@ -64,22 +64,35 @@ T.ToolTip {
                               0.22)
     }
 
+    // shadcn/Radix: fade-in-0 zoom-in-95 slide-in-from-<trigger side>-2,
+    // fade-out-0 zoom-out-95, 150 ms CSS `ease`. Grows out of the trigger
+    // whether the chip sits below it or was flipped above.
+    readonly property bool _above: y < 0
+    transformOrigin: _above ? T.Popup.Bottom : T.Popup.Top
+
     enter: Transition {
         ParallelAnimation {
-            NumberAnimation { property: "opacity"
-                              from: 0.0; to: 1.0
-                              duration: 150; easing.type: Easing.OutQuad }
-            // Slide *down* a few pixels into place — matches the chip
-            // appearing under its trigger.
+            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0
+                              duration: 150; easing.type: Easing.Bezier
+                              easing.bezierCurve: [0.25, 0.1, 0.25, 1, 1, 1] }
+            NumberAnimation { property: "scale"; from: 0.95; to: 1.0
+                              duration: 150; easing.type: Easing.Bezier
+                              easing.bezierCurve: [0.25, 0.1, 0.25, 1, 1, 1] }
             NumberAnimation { property: "y"
-                              from: root.y - 4; to: root.y
-                              duration: 150; easing.type: Easing.OutQuad }
+                              from: root.y + (root._above ? 8 : -8); to: root.y
+                              duration: 150; easing.type: Easing.Bezier
+                              easing.bezierCurve: [0.25, 0.1, 0.25, 1, 1, 1] }
         }
     }
 
     exit: Transition {
-        NumberAnimation { property: "opacity"
-                          from: 1.0; to: 0.0
-                          duration: 100; easing.type: Easing.InQuad }
+        ParallelAnimation {
+            NumberAnimation { property: "opacity"; from: 1.0; to: 0.0
+                              duration: 150; easing.type: Easing.Bezier
+                              easing.bezierCurve: [0.25, 0.1, 0.25, 1, 1, 1] }
+            NumberAnimation { property: "scale"; from: 1.0; to: 0.95
+                              duration: 150; easing.type: Easing.Bezier
+                              easing.bezierCurve: [0.25, 0.1, 0.25, 1, 1, 1] }
+        }
     }
 }
