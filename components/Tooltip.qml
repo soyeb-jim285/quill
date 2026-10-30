@@ -14,7 +14,12 @@ T.ToolTip {
     // Hyprland/KWin — bg Rectangles inside paint into a buffer that
     // never composites onto the screen, so the chip looks "missing".
     // Item-mode rendering is bullet-proof for short-lived hover chips.
-    popupType: T.Popup.Item
+    // popupType is Qt 6.8+; naming it directly makes the whole type fail to
+    // load on older Qt, which only has in-window popups anyway.
+    Component.onCompleted: {
+        if (root.popupType !== undefined)
+            root.popupType = T.Popup.Item
+    }
 
     delay: 100
     timeout: -1
