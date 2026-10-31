@@ -25,7 +25,9 @@ RowLayout {
         color: Theme.textPrimary
         font.pixelSize: Theme.fontSize
         font.family: Theme.fontFamily
-        Layout.preferredWidth: 140
+        // Labels line up at 140 px; a longer one pushes its track over
+        // rather than running under it.
+        Layout.preferredWidth: Math.max(140, implicitWidth)
     }
     Item {
         Layout.fillWidth: true
